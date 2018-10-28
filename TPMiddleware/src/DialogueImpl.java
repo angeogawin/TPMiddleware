@@ -10,6 +10,7 @@ public class DialogueImpl extends UnicastRemoteObject implements Dialogue {
 
 	ArrayList<String> clients;
 	ArrayList<Message> messages;
+	String nickname;
 	
 	protected DialogueImpl() throws RemoteException {
 		super();
@@ -17,12 +18,13 @@ public class DialogueImpl extends UnicastRemoteObject implements Dialogue {
 		// TODO Auto-generated constructor stub
 	
 	}
-	protected DialogueImpl(ArrayList<String> clients,ArrayList<Message> messages) throws RemoteException {
+	protected DialogueImpl(String nickname,ArrayList<String> clients,ArrayList<Message> messages) throws RemoteException {
 		
 		
 		
 		this.clients=clients;
 		this.messages=messages;
+		this.nickname=nickname;
 		
 	}
 	
@@ -46,11 +48,11 @@ public class DialogueImpl extends UnicastRemoteObject implements Dialogue {
 
 
 	@Override
-	public ArrayList<Message> getMessages(String pseudo) throws RemoteException {
+	public ArrayList<Message> getMessages() throws RemoteException {
 		// TODO Auto-generated method stub
 		ArrayList<Message> retour=new ArrayList<>();
 		for (Message m:messages) {
-			if(m.getTo().equals(pseudo)) {
+			if(m.getTo().equals(nickname)) {
 				retour.add(m);
 			}
 		}

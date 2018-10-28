@@ -8,5 +8,5 @@ public interface Dialogue extends Remote {
 	
     ArrayList<String> getClients() throws RemoteException;
     void sendMessage(Message m) throws RemoteException;
-    ArrayList<Message> getMessages(String pseudo) throws RemoteException;
+    ArrayList<Message> getMessages() throws RemoteException;
 }

@@ -24,8 +24,9 @@ public class ConnectionImpl extends UnicastRemoteObject implements Connexion {
 		
 	
 		clients.add(nickname);
-		Dialogue dialogue =new DialogueImpl(clients,messages);
+		Dialogue dialogue =new DialogueImpl(nickname,clients,messages);
 		try {
+			
 			Naming.rebind("Dialogue"+nickname, dialogue);
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block

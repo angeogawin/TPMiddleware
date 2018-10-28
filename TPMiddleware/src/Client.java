@@ -91,7 +91,7 @@ public class Client {
 				}
 				else if(theLine.contains("getMessages")) {
 					if(pseudo!=null) {
-						ArrayList<Message> messagesRecus=dialogue.getMessages(pseudo);
+						ArrayList<Message> messagesRecus=dialogue.getMessages();
 						for(Message m:messagesRecus) {
 							System.out.println("From: "+ String.valueOf(m.getFrom()));
 							System.out.println("Contenu: "+ String.valueOf(m.getMessage()));
