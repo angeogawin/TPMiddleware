@@ -3,7 +3,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
-import org.apache.commons.lang.ArrayUtils;
+
 
 
 public class DialogueImpl extends UnicastRemoteObject implements Dialogue {
@@ -27,30 +27,6 @@ public class DialogueImpl extends UnicastRemoteObject implements Dialogue {
 	}
 	
 	
-
-	
-	
-	@Override
-	public void connect(String pseudo) throws RemoteException{
-		
-		
-		clients.add(pseudo);
-		
-		
-	}
-
-
-
-	@Override
-	public void disconnect(String pseudo) throws RemoteException {
-		// TODO Auto-generated method stub
-		clients.remove(pseudo);
-		
-		
-	}
-
-
-
 	@Override
 	public ArrayList<String> getClients() throws RemoteException {
 		// TODO Auto-generated method stub

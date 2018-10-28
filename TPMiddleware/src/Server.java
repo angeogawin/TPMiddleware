@@ -18,10 +18,10 @@ public class Server {
 			clients=new ArrayList<>();
 			messages=new ArrayList<>();
 			
-			Dialogue dialogue =new DialogueImpl(clients,messages);
+			Connexion connexionComponent=new ConnectionImpl(clients,messages);
 			
 			Naming.rebind("Hello", myComponent);//rebinds the specified name to a new remote object
-			Naming.rebind("Dialogue", dialogue);
+			Naming.rebind("Connexion", connexionComponent);
 			System.out.println("Serveur actif");
 			
 		} catch (RemoteException | MalformedURLException e) {

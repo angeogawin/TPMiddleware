@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 public class Client {
 	private static String pseudo;
+	static private Connexion connexionComponent;
 	static private Dialogue dialogue;
 	private static boolean endSession;
 	
@@ -25,7 +26,8 @@ public class Client {
 		
 		try {
 			myComponent = (Hello) Naming.lookup("Hello");
-			dialogue = (Dialogue) Naming.lookup("Dialogue");
+			connexionComponent = (Connexion) Naming.lookup("Connexion");
+			
 			System.out.println(myComponent.sayHello());
 			
 			
@@ -36,7 +38,7 @@ public class Client {
 				if (!sessionStarted) {
 					sessionStarted = true;
 					System.out.println("entrez une requête au clavier " + "(le serveur comprend \n   [connect pseudo];\n"
-							+ "  [getMessages];[getClients];[quit]\n tapez [disconnect] pour stopper la session sur le serveur\n)"
+							+ "  [getMessages];[sendMessage;to;message];[getClients];[quit]\n tapez [disconnect] pour stopper la session sur le serveur\n)"
 							);
 				}
 
@@ -50,16 +52,26 @@ public class Client {
 				if (theLine.equals("disconnect")) {
 					System.out.println("le serveur va terminer cette session");
 					
-					dialogue.disconnect(pseudo);
+					connexionComponent.disconnect(pseudo);
+					System.out.println(pseudo+ " est déconnecté");
+					pseudo="";
 				}
 				else if (theLine.equals("quit")) {
 					System.out.println("le serveur va fermer");
 					endSession=true;
-					dialogue.disconnect(pseudo);
+					connexionComponent.disconnect(pseudo);
+					
 				}
 				else if(theLine.contains("connect")) {
-					pseudo=theLine.split(" ")[1];
-					dialogue.connect(theLine.split(" ")[1]);
+					if(pseudo==null || pseudo.equals("")) {
+						pseudo=theLine.split(" ")[1];
+						dialogue=connexionComponent.connect(pseudo);
+						System.out.println(pseudo+ " est connecté");
+					}
+					else {
+						System.out.println("Veuillez vous déconnecter de "+pseudo+ "afin de changer de compte");
+					}
+					
 					
 				}
 				else if(theLine.contains("sendMessage")) {
@@ -68,7 +80,11 @@ public class Client {
 						String contenu=theLine.split(";")[2];
 						Message m=new Message(pseudo,to,contenu);
 						dialogue.sendMessage(m);
+						System.out.println("Envoyé!");
 						
+					}
+					else {
+						System.out.println("Veuillez vous connecter afin d'acceder au chat");
 					}
 					
 					
@@ -81,18 +97,36 @@ public class Client {
 							System.out.println("Contenu: "+ String.valueOf(m.getMessage()));
 						}
 						
+						if(messagesRecus.size()==0) {
+							System.out.println("Aucun message recu");
+						}
 						
+						
+					}
+					else {
+						System.out.println("Veuillez vous connecter afin d'acceder au chat");
 					}
 					
 				}
 				
 				else if(theLine.equals("getClients")) {
-					for (String a:dialogue.getClients()){
-						System.out.println(a);
-					}
+					if(pseudo!=null) {
+						for (String a:dialogue.getClients()){
+							if(!a.equals(pseudo)) {
+								System.out.println(a);
+							}
+						
+						
+						}
+						if(dialogue.getClients().size()==1) {
+							System.out.println("Aucun autre client connecté :(");
+						}
 					
+					}
+					else {
+						System.out.println("Veuillez vous connecter afin d'acceder au chat");
+					}
 				}
-			
 				
 		
 			}
