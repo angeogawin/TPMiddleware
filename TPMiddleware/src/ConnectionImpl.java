@@ -19,21 +19,22 @@ public class ConnectionImpl extends UnicastRemoteObject implements Connexion {
 	}
 
 	@Override
-	public Dialogue connect(String nickname) throws RemoteException {
+	public Emitter connect(String nickname,Receiver rcv) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 	
 		clients.add(nickname);
-		Dialogue dialogue =new DialogueImpl(nickname,clients,messages);
+		Emitter emitterComponent=new EmitterImpl();
+		
 		try {
+			Naming.rebind("Emitter"+nickname, emitterComponent);
 			
-			Naming.rebind("Dialogue"+nickname, dialogue);
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		return dialogue;
+		return emitterComponent;
 	}
 
 	@Override

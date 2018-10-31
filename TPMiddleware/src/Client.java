@@ -13,7 +13,8 @@ import java.util.ArrayList;
 public class Client {
 	private static String pseudo;
 	static private Connexion connexionComponent;
-	static private Dialogue dialogue;
+	static private Emitter emitterComponent;
+
 	private static boolean endSession;
 	
 	public Client(String pseudo) {
@@ -23,10 +24,13 @@ public class Client {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Hello myComponent;
+		 ArrayList<String> clients = null;
 		
 		try {
+			
 			myComponent = (Hello) Naming.lookup("Hello");
 			connexionComponent = (Connexion) Naming.lookup("Connexion");
+			emitterComponent=(Emitter) Naming.lookup("Emitter");
 			
 			System.out.println(myComponent.sayHello());
 			
@@ -65,7 +69,9 @@ public class Client {
 				else if(theLine.contains("connect")) {
 					if(pseudo==null || pseudo.equals("")) {
 						pseudo=theLine.split(" ")[1];
-						dialogue=connexionComponent.connect(pseudo);
+						Receiver receiverComponent=new ReceiverImpl(pseudo, clients);
+						Naming.rebind("Receiver"+pseudo, receiverComponent);
+						emitterComponent=connexionComponent.connect(pseudo,receiverComponent);
 						System.out.println(pseudo+ " est connecté");
 					}
 					else {
@@ -79,7 +85,7 @@ public class Client {
 						String to=theLine.split(";")[1];
 						String contenu=theLine.split(";")[2];
 						Message m=new Message(pseudo,to,contenu);
-						dialogue.sendMessage(m);
+						emitterComponent.sendMessage(m);
 						System.out.println("Envoyé!");
 						
 					}
@@ -89,7 +95,7 @@ public class Client {
 					
 					
 				}
-				else if(theLine.contains("getMessages")) {
+				/*else if(theLine.contains("getMessages")) {
 					if(pseudo!=null) {
 						ArrayList<Message> messagesRecus=dialogue.getMessages();
 						for(Message m:messagesRecus) {
@@ -126,7 +132,7 @@ public class Client {
 					else {
 						System.out.println("Veuillez vous connecter afin d'acceder au chat");
 					}
-				}
+				}*/
 				
 		
 			}

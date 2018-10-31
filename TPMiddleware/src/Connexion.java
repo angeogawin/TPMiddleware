@@ -3,7 +3,7 @@ import java.rmi.RemoteException;
 
 public interface Connexion extends Remote {
 	
-	Dialogue connect(String nickname) throws RemoteException;
+	Emitter connect(String nickname,Receiver rcv) throws RemoteException;
 	void disconnect(String nickname) throws RemoteException;
 
 
