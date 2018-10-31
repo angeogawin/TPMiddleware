@@ -48,18 +48,30 @@ public class Client {
 					e.printStackTrace();
 				}
 				if (theLine.equals("disconnect")) {
+					if(pseudo!=null) {
 					System.out.println("le serveur va terminer cette session");
 					
 					dialogue.disconnect(pseudo);
+					}
+					
+					else {
+						System.out.println("Vous n'étiez pas connecté");
+					}
 				}
 				else if (theLine.equals("quit")) {
+					if(pseudo!=null) {
 					System.out.println("le serveur va fermer");
 					endSession=true;
 					dialogue.disconnect(pseudo);
+					}
+					
+					else {
+						System.out.println("Vous n'étiez pas connecté");
+					}
 				}
 				else if(theLine.contains("connect")) {
 					pseudo=theLine.split(" ")[1];
-					dialogue.connect(theLine.split(" ")[1]);
+					dialogue.connect(pseudo);
 					
 				}
 				else if(theLine.contains("sendMessage")) {
@@ -69,6 +81,9 @@ public class Client {
 						Message m=new Message(pseudo,to,contenu);
 						dialogue.sendMessage(m);
 						
+					}
+					else {
+						System.out.println("Veuillez vous connecter");
 					}
 					
 					
@@ -83,14 +98,25 @@ public class Client {
 						
 						
 					}
+					else {
+						System.out.println("Veuillez vous connecter");
+					}
 					
 				}
 				
 				else if(theLine.equals("getClients")) {
-					for (String a:dialogue.getClients()){
-						System.out.println(a);
+					if(pseudo!=null) {
+						for (String a:dialogue.getClients()){
+							if(!a.equals(pseudo)) {
+								System.out.println(a);
+							}
+							
+							
+						}
 					}
-					
+					else {
+						System.out.println("Veuillez vous connecter");
+					}
 				}
 			
 				
