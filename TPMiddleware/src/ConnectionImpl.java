@@ -22,9 +22,9 @@ public class ConnectionImpl extends UnicastRemoteObject implements Connexion {
 	public Emitter connect(String nickname,Receiver rcv) throws RemoteException {
 		// TODO Auto-generated method stub
 		
-	
+	    
 		clients.add(nickname);
-		Emitter emitterComponent=new EmitterImpl();
+		Emitter emitterComponent=new EmitterImpl(messages);
 		
 		try {
 			Naming.rebind("Emitter"+nickname, emitterComponent);
@@ -33,6 +33,7 @@ public class ConnectionImpl extends UnicastRemoteObject implements Connexion {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 
 		return emitterComponent;
 	}
@@ -42,7 +43,7 @@ public class ConnectionImpl extends UnicastRemoteObject implements Connexion {
 		// TODO Auto-generated method stub
 		clients.remove(nickname);
 		try {
-			Naming.unbind("Dialogue"+nickname);
+			Naming.unbind("Emitter"+nickname);
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

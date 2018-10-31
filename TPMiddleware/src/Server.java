@@ -35,6 +35,7 @@ public class Server {
 			while(serverAlive) {
 				
 				if(messages.size()>lastSizeMessages) {
+					//cela signifie qu'il y a un nouveau message sur le serveur à délivrer
 					lastSizeMessages=messages.size();
 					Message m=messages.get(lastSizeMessages-1);
 					try {
@@ -46,16 +47,58 @@ public class Server {
 					}
 				}
 				if(clients.size()>lastSizeClients) {
+					//cela signifie qu'un nouveau client est connecté
 					lastSizeClients=clients.size();
 					
 					for(String c:clients) {
-						try {
-							Receiver receiver=(Receiver) Naming.lookup("Receiver"+c);
-							receiver.addClient(clients.get((lastSizeClients)-1));
-						} catch (NotBoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+						if(!c.equals(clients.get(lastSizeClients-1))) {
+							//on informe tous les autres clients qu'un nouveau arrive
+							try {
+								Receiver receiver=(Receiver) Naming.lookup("Receiver"+c);
+								receiver.addClient(clients.get((lastSizeClients)-1));
+							} catch (NotBoundException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						}
+						else {
+							//on informe le nouveau de la liste des personnes sur le chat
+							try {
+								Receiver receiver=(Receiver) Naming.lookup("Receiver"+c);
+								receiver.initClients(clients);
+							} catch (NotBoundException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+						
+					}
+				}
+				else if(clients.size()<lastSizeClients) {
+					//cela signifie qu'un client s'est déconnecté
+					lastSizeClients=clients.size();
+					for(String c:clients) {
+						if(!c.equals(clients.get(lastSizeClients-1))) {
+							//on informe tous les autres clients qu'un client est parti
+							try {
+								Receiver receiver=(Receiver) Naming.lookup("Receiver"+c);
+								receiver.addClient(clients.get((lastSizeClients)-1));
+							} catch (NotBoundException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+						else {
+							//on informe le nouveau de la liste des personnes sur le chat
+							try {
+								Receiver receiver=(Receiver) Naming.lookup("Receiver"+c);
+								receiver.initClients(clients);
+							} catch (NotBoundException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+						
 					}
 				}
 				

@@ -25,6 +25,7 @@ public class Client {
 		// TODO Auto-generated method stub
 		Hello myComponent;
 		 ArrayList<String> clients = null;
+		 ArrayList<Message> messages=null;
 		
 		try {
 			
@@ -69,7 +70,7 @@ public class Client {
 				else if(theLine.contains("connect")) {
 					if(pseudo==null || pseudo.equals("")) {
 						pseudo=theLine.split(" ")[1];
-						Receiver receiverComponent=new ReceiverImpl(pseudo, clients);
+						Receiver receiverComponent=new ReceiverImpl(pseudo, clients,messages);
 						Naming.rebind("Receiver"+pseudo, receiverComponent);
 						emitterComponent=connexionComponent.connect(pseudo,receiverComponent);
 						System.out.println(pseudo+ " est connecté");
