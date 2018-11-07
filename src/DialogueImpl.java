@@ -1,4 +1,5 @@
 
+
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -8,8 +9,7 @@ import java.util.ArrayList;
 
 public class DialogueImpl extends UnicastRemoteObject implements Dialogue {
 
-	ArrayList<String> clients;
-	ArrayList<Message> messages;
+	Server server;
 	String nickname;
 	
 	protected DialogueImpl() throws RemoteException {
@@ -18,12 +18,11 @@ public class DialogueImpl extends UnicastRemoteObject implements Dialogue {
 		// TODO Auto-generated constructor stub
 	
 	}
-	protected DialogueImpl(String nickname,ArrayList<String> clients,ArrayList<Message> messages) throws RemoteException {
+	protected DialogueImpl(String nickname,Server server) throws RemoteException {
 		
 		
 		
-		this.clients=clients;
-		this.messages=messages;
+		this.server=server;
 		this.nickname=nickname;
 		
 	}
@@ -32,7 +31,14 @@ public class DialogueImpl extends UnicastRemoteObject implements Dialogue {
 	@Override
 	public ArrayList<String> getClients() throws RemoteException {
 		// TODO Auto-generated method stub
-		return clients;
+		ArrayList<String> retour=new ArrayList<>();
+		for(String c:server.clients) {
+			if(!(c.equals(nickname))) {
+				retour.add(c);
+				
+			}
+		}
+		return retour;
 		
 	}
 
@@ -41,7 +47,7 @@ public class DialogueImpl extends UnicastRemoteObject implements Dialogue {
 	@Override
 	public void sendMessage(Message m) throws RemoteException {
 		// TODO Auto-generated method stub
-		messages.add(m);
+		server.messages.add(m);
 		
 	}
 
@@ -51,7 +57,7 @@ public class DialogueImpl extends UnicastRemoteObject implements Dialogue {
 	public ArrayList<Message> getMessages() throws RemoteException {
 		// TODO Auto-generated method stub
 		ArrayList<Message> retour=new ArrayList<>();
-		for (Message m:messages) {
+		for (Message m:server.messages) {
 			if(m.getTo().equals(nickname)) {
 				retour.add(m);
 			}

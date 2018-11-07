@@ -1,3 +1,4 @@
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -37,8 +38,9 @@ public class Client {
 			while (!endSession) {
 				if (!sessionStarted) {
 					sessionStarted = true;
-					System.out.println("entrez une requête au clavier " + "(le serveur comprend \n   [connect pseudo];\n"
-							+ "  [getMessages];[sendMessage;to;message];[getClients];[quit]\n tapez [disconnect] pour stopper la session sur le serveur\n)"
+					System.out.println("Bienvenue dans Chat 2000. Le serveur comprend les requêtes suivante:\r\n" + 
+							" connect pseudo |disconnect | getClients | getMessages  | sendMessage;to;message | quit \n"
+						
 							);
 				}
 
@@ -112,13 +114,13 @@ public class Client {
 				else if(theLine.equals("getClients")) {
 					if(pseudo!=null) {
 						for (String a:dialogue.getClients()){
-							if(!a.equals(pseudo)) {
+						
 								System.out.println(a);
-							}
+							
 						
 						
 						}
-						if(dialogue.getClients().size()==1) {
+						if(dialogue.getClients().size()==0) {
 							System.out.println("Aucun autre client connecté :(");
 						}
 					
