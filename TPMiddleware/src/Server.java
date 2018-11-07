@@ -6,19 +6,25 @@ import java.rmi.registry.LocateRegistry;
 import java.util.ArrayList;
 
 public class Server {
+	 ArrayList<String> clients;
+	 ArrayList<Message> messages;
+	
+	public Server() {
+		clients=new ArrayList<String>();
+		messages=new ArrayList<Message>();
+	}
 	
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		 ArrayList<String> clients;
-		 ArrayList<Message> messages;
+	    Server server=new Server();
+		 
 		try {
 			//LocateRegistry.createRegistry(8055);
 			Hello myComponent = new HelloImpl();
-			clients=new ArrayList<>();
-			messages=new ArrayList<>();
 			
-			Dialogue dialogue =new DialogueImpl(clients,messages);
+			
+			Dialogue dialogue =new DialogueImpl(server);
 			
 			Naming.rebind("Hello", myComponent);//rebinds the specified name to a new remote object
 			Naming.rebind("Dialogue", dialogue);

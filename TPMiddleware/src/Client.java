@@ -1,3 +1,5 @@
+
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -35,8 +37,8 @@ public class Client {
 			while (!endSession) {
 				if (!sessionStarted) {
 					sessionStarted = true;
-					System.out.println("entrez une requête au clavier " + "(le serveur comprend \n   [connect pseudo];\n"
-							+ "  [getMessages];[getClients];[quit]\n tapez [disconnect] pour stopper la session sur le serveur\n)"
+					System.out.println("Bienvenue dans Chat 2000. Le serveur comprend les requêtes suivante:\n"
+							+ " connect pseudo |disconnect | getClients | getMessages  | sendMessage;to;message | quit \n\n"
 							);
 				}
 
@@ -52,6 +54,7 @@ public class Client {
 					System.out.println("le serveur va terminer cette session");
 					
 					dialogue.disconnect(pseudo);
+					System.out.println("Deconnecté");
 					}
 					
 					else {
@@ -70,8 +73,14 @@ public class Client {
 					}
 				}
 				else if(theLine.contains("connect")) {
-					pseudo=theLine.split(" ")[1];
-					dialogue.connect(pseudo);
+					if(pseudo!=null) {
+						System.out.println("Veuillez d'abord vous déconnecter de "+ pseudo);
+					}
+					else {
+						pseudo=theLine.split(" ")[1];
+						dialogue.connect(pseudo);
+						System.out.println(pseudo+" est connecté");
+					}
 					
 				}
 				else if(theLine.contains("sendMessage")) {
@@ -80,6 +89,7 @@ public class Client {
 						String contenu=theLine.split(";")[2];
 						Message m=new Message(pseudo,to,contenu);
 						dialogue.sendMessage(m);
+						System.out.println("Envoyé!");
 						
 					}
 					else {
@@ -91,8 +101,11 @@ public class Client {
 				else if(theLine.contains("getMessages")) {
 					if(pseudo!=null) {
 						ArrayList<Message> messagesRecus=dialogue.getMessages(pseudo);
+						if(messagesRecus.size()==0) {
+							System.out.println("Aucun message");
+						}
 						for(Message m:messagesRecus) {
-							System.out.println("From: "+ String.valueOf(m.getFrom()));
+							System.out.println("De: "+ String.valueOf(m.getFrom()));
 							System.out.println("Contenu: "+ String.valueOf(m.getMessage()));
 						}
 						
@@ -106,13 +119,16 @@ public class Client {
 				
 				else if(theLine.equals("getClients")) {
 					if(pseudo!=null) {
+						String listeconnecte="- ";
 						for (String a:dialogue.getClients()){
 							if(!a.equals(pseudo)) {
-								System.out.println(a);
+								listeconnecte+=a+", ";
+								
 							}
 							
 							
 						}
+						System.out.println(listeconnecte);
 					}
 					else {
 						System.out.println("Veuillez vous connecter");

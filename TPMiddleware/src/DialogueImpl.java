@@ -2,14 +2,12 @@
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-
-import org.apache.commons.lang.ArrayUtils;
+import java.util.ArrayList;
 
 
 public class DialogueImpl extends UnicastRemoteObject implements Dialogue {
 
-	ArrayList<String> clients;
-	ArrayList<Message> messages;
+	Server server;
 	
 	protected DialogueImpl() throws RemoteException {
 		super();
@@ -17,12 +15,12 @@ public class DialogueImpl extends UnicastRemoteObject implements Dialogue {
 		// TODO Auto-generated constructor stub
 	
 	}
-	protected DialogueImpl(ArrayList<String> clients,ArrayList<Message> messages) throws RemoteException {
+	protected DialogueImpl(Server server) throws RemoteException {
 		
 		
 		
-		this.clients=clients;
-		this.messages=messages;
+		this.server=server;
+		
 		
 	}
 	
@@ -34,7 +32,7 @@ public class DialogueImpl extends UnicastRemoteObject implements Dialogue {
 	public void connect(String pseudo) throws RemoteException{
 		
 		
-		clients.add(pseudo);
+		server.clients.add(pseudo);
 		
 		
 	}
@@ -44,7 +42,7 @@ public class DialogueImpl extends UnicastRemoteObject implements Dialogue {
 	@Override
 	public void disconnect(String pseudo) throws RemoteException {
 		// TODO Auto-generated method stub
-		clients.remove(pseudo);
+		server.clients.remove(pseudo);
 		
 		
 	}
@@ -54,7 +52,7 @@ public class DialogueImpl extends UnicastRemoteObject implements Dialogue {
 	@Override
 	public ArrayList<String> getClients() throws RemoteException {
 		// TODO Auto-generated method stub
-		return clients;
+		return server.clients;
 		
 	}
 
@@ -63,7 +61,7 @@ public class DialogueImpl extends UnicastRemoteObject implements Dialogue {
 	@Override
 	public void sendMessage(Message m) throws RemoteException {
 		// TODO Auto-generated method stub
-		messages.add(m);
+		server.messages.add(m);
 		
 	}
 
@@ -73,7 +71,7 @@ public class DialogueImpl extends UnicastRemoteObject implements Dialogue {
 	public ArrayList<Message> getMessages(String pseudo) throws RemoteException {
 		// TODO Auto-generated method stub
 		ArrayList<Message> retour=new ArrayList<>();
-		for (Message m:messages) {
+		for (Message m:server.messages) {
 			if(m.getTo().equals(pseudo)) {
 				retour.add(m);
 			}
