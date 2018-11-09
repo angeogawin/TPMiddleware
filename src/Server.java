@@ -5,35 +5,46 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Server {
+	
+	ArrayList<String> clients;
+	ArrayList<Message> messages;
+	HashMap<String,ClientConnection> listeClientConnection;//associe a chaque nickname un "clientconnection"
+	HashMap<String,ClientManager> listeClientManager;//associe a chaque nickname un "clientmanager"
+	
+	public Server() {
+		clients=new ArrayList<>();
+		messages=new ArrayList<>();
+		listeClientConnection=new HashMap<>();
+		listeClientManager=new HashMap<>();
+	}
 	
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		 ArrayList<String> clients;
-		 ArrayList<Message> messages;
+		 
 		 
 		try {
 			//LocateRegistry.createRegistry(8055);
-			Hello myComponent = new HelloImpl();
-			clients=new ArrayList<>();
-			messages=new ArrayList<>();
+			Server server=new Server();
+			ServerConnection serverConnection=new ServerConnectionImpl(server);
+			
 			Boolean serverAlive=true;
 			int lastSizeMessages=0;
 			int lastSizeClients=0;
 			
-			Connexion connexionComponent=new ConnectionImpl(clients,messages);
+			Naming.rebind("ServerConnection", serverConnection);
 			
 			
-			Naming.rebind("Hello", myComponent);//rebinds the specified name to a new remote object
-			Naming.rebind("Connexion", connexionComponent);
+			
 			
 			System.out.println("Serveur actif");
 			
 			
 			while(serverAlive) {
-				
+			/*	
 				if(messages.size()>lastSizeMessages) {
 					//cela signifie qu'il y a un nouveau message sur le serveur à délivrer
 					lastSizeMessages=messages.size();
@@ -100,7 +111,7 @@ public class Server {
 						}
 						
 					}
-				}
+				}*/
 				
 				
 			}
