@@ -42,13 +42,13 @@ public class ServerConnectionImpl extends UnicastRemoteObject implements ServerC
 			Naming.unbind("ClientManager"+nickname);
 			server.listeClientManager.remove(nickname);
 			server.clients.remove(nickname);
-		    for(String c:server.clients) {
-		    	//on supprime tous les composants messages box eventuellement créés pour faire communiquer nickname et d'autres clients
-		    	String nomComposant1="MessageBox"+nickname+c;
-		    	String nomComposant2="MessageBox"+c+nickname;
-		    	Naming.unbind(nomComposant1);
-		    	Naming.unbind(nomComposant2);
-		    }
+			
+		   
+		    for (Map.Entry<String,ClientManager> entry :server.listeClientManager.entrySet()) {
+			    String key = entry.getKey();
+			    ClientManager c = entry.getValue();
+			    c.remClient(nickname);
+			}
 		
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block

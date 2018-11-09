@@ -19,6 +19,9 @@ public class Client {
 	ClientConnection clientCnxComponent;
 	ServerConnection serverConnectionComponent;
 	HashMap<String,MessageBox> listeBox;//contient la liste des boites associée à chaque client connecté auquel ce client
+	int lastSizeClients;
+	int lastSizeMessage;
+	String listeClients;
 	//pourra envoyer des messages
 	
 	private static boolean endSession;
@@ -27,13 +30,61 @@ public class Client {
 		clients = new ArrayList<>();
 		messages=new ArrayList<>();
 		listeBox=new HashMap<>();
+		lastSizeClients=0;
+		lastSizeMessage=0;
+		listeClients="";
+	}
+	
+	public void actualiserConsole() {
+		//cette fonction permet de rafraichir la liste de messages et clients
+		
+		if(this.pseudo!=null) {
+			if(this.clients!=null) {
+			if(this.clients.size()!=this.lastSizeClients) {
+				this.lastSizeClients=this.clients.size();
+				this.listeClients="";
+				for (String c:this.clients) {
+					this.listeClients+=c+",";
+					
+			
+				}
+				if(this.listeClients.equals("")) {
+					System.out.println("Présents sur le réseau: Personne");
+				}
+				else {
+					System.out.println("Présents sur le réseau: "+this.listeClients);
+				}
+			
+			}
+			}
+			if(this.messages!=null) {
+			if(this.messages.size()>this.lastSizeMessage) {
+				for(int i=this.lastSizeMessage;i<this.messages.size();i++) {
+					System.out.println("De: "+this.messages.get(i).from+" - "+this.messages.get(i).message);
+				}
+				
+				this.lastSizeMessage=this.messages.size();
+						
+			}
+			}
+		}
 	}
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Client client=new Client();
 		
-		 
+		new java.util.Timer().scheduleAtFixedRate( 
+		        new java.util.TimerTask() {
+		            @Override
+		            public void run() {
+		                // on rafraichit la liste des clients et messages regulierement
+		            	client.actualiserConsole();
+		            }
+		        }, 
+		        1000 ,1000
+		);
+
 		
 		try {
 			
@@ -66,6 +117,14 @@ public class Client {
 					client.serverConnectionComponent.disconnect(client.pseudo);
 					System.out.println(client.pseudo+ " est déconnecté");
 					client.pseudo="";
+					client.clients.clear();
+					for(String c:client.listeBox.keySet()) {
+						//on supprime tous les composants messages box créés pour faire communiquer nickname et d'autres clients
+				    	String nomComposant1="MessageBox"+client.pseudo+c;
+				    	String nomComposant2="MessageBox"+c+client.pseudo;
+				    	Naming.unbind(nomComposant1);
+				    	Naming.unbind(nomComposant2);
+					}
 				}
 				else if (theLine.equals("quit")) {
 					System.out.println("le serveur va fermer");
@@ -73,18 +132,36 @@ public class Client {
 					client.serverConnectionComponent.disconnect(client.pseudo);
 					
 				}
-				else if(theLine.contains("cs")) {
+				else if(theLine.contains("connect")) {
 					//s'enregistrer aupres du serveur
 					if(client.pseudo==null || client.pseudo.equals("")) {
 						client.pseudo=theLine.split(" ")[1];
 						//on ajoute nos composants dans le registre
 						client.clientMgrComponent=new ClientManagerImpl(client);
-						client.clientCnxComponent=new ClientConnectionImpl();
+						client.clientCnxComponent=new ClientConnectionImpl(client);
 						Naming.rebind("ClientManager"+client.pseudo, client.clientMgrComponent);
 						Naming.rebind("ClientConnection"+client.pseudo, client.clientCnxComponent);
 					   
 						client.serverConnectionComponent.connect(client.pseudo, client.clientCnxComponent, client.clientMgrComponent);
 						System.out.println(client.pseudo+ " est connecté");
+					
+					    //on affiche les clients deja presents sur le reseau
+						if(client.clients.size()!=client.lastSizeClients) {
+							client.lastSizeClients=client.clients.size();
+							client.listeClients="";
+							for (String c:client.clients) {
+								client.listeClients+=c+",";
+								
+						
+							}
+							if(client.listeClients.equals("")) {
+								System.out.println("Présents sur le réseau: Personne");
+							}
+							else {
+								System.out.println("Présents sur le réseau: "+client.listeClients);
+							}
+						
+						}
 					}
 					else {
 						System.out.println("Veuillez vous déconnecter de "+client.pseudo+ "afin de changer de compte");

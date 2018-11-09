@@ -42,9 +42,9 @@ public class Server {
 			
 			System.out.println("Serveur actif");
 			
-			
-			while(serverAlive) {
 			/*	
+			while(serverAlive) {
+			
 				if(messages.size()>lastSizeMessages) {
 					//cela signifie qu'il y a un nouveau message sur le serveur à délivrer
 					lastSizeMessages=messages.size();
@@ -111,10 +111,10 @@ public class Server {
 						}
 						
 					}
-				}*/
+				}
 				
 				
-			}
+			}*/
 			
 		} catch (RemoteException | MalformedURLException e) {
 			// TODO Auto-generated catch block
