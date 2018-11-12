@@ -1,14 +1,17 @@
-package src;
+package composants;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+
+import src.Client;
+import src.Message;
 
 public class ReceiverImpl extends UnicastRemoteObject implements Receiver {
     Client client;
 	protected ReceiverImpl() throws RemoteException {
 		super();
 		
-		// TODO Auto-generated constructor stub
+	
 	}
 	
 	
@@ -19,7 +22,7 @@ public class ReceiverImpl extends UnicastRemoteObject implements Receiver {
 
 	@Override
 	public void receive(String from, String message) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		Message m =new Message(from,client.pseudo,message);
 		client.messages.add(m);
 		
@@ -28,7 +31,7 @@ public class ReceiverImpl extends UnicastRemoteObject implements Receiver {
 
 	@Override
 	public void initClients(ArrayList<String> clientsSurServeur) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		for (String c:clientsSurServeur) {
 			if(!c.equals(client.pseudo)) {
 				client.clients.add(c);
@@ -41,8 +44,8 @@ public class ReceiverImpl extends UnicastRemoteObject implements Receiver {
 
 	@Override
 	public void addClient(String clientArrive) throws RemoteException {
-		// TODO Auto-generated method stub
-		if(!client.equals(client.pseudo)) {
+		
+		if(!clientArrive.equals(client.pseudo)) {
 			client.clients.add(clientArrive);
 		}
 		
@@ -50,8 +53,8 @@ public class ReceiverImpl extends UnicastRemoteObject implements Receiver {
 
 	@Override
 	public void remClient(String clientParti) throws RemoteException {
-		// TODO Auto-generated method stub
-		if(!client.equals(client.pseudo)) {
+		
+		if(!clientParti.equals(client.pseudo)) {
 			client.clients.remove(clientParti);
 		}
 	}

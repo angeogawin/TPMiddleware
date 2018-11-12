@@ -3,32 +3,37 @@ package src;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.InetSocketAddress;
+import java.io.Serializable;
 import java.net.MalformedURLException;
-import java.net.Socket;
+
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
+
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import sun.security.jca.GetInstance;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class Client {
-	 String pseudo;
-	static private Connexion connexionComponent;
+import composants.Connexion;
+import composants.Emitter;
+import composants.Receiver;
+import composants.ReceiverImpl;
+
+
+
+public class Client implements Serializable{
+	public String pseudo;
+	private Connexion connexionComponent;
 	Emitter emitterComponent;
-	 ArrayList<String> clients;
-	ArrayList<Message> messages;
+	public ArrayList<String> clients;
+	public ArrayList<Message> messages;
 	String listeClients;
 	 int lastSizeClients;
 	int lastSizeMessage;
 
 	boolean endSession;
-	
+	Logger logger = Logger.getLogger("logger");
 	public Client() {
 		
 		clients=new ArrayList<>();
@@ -40,13 +45,96 @@ public class Client {
 		
 		
 	}
+	public String lireCommande() {
+		String theLine="";
+		BufferedReader userIn = new BufferedReader(new InputStreamReader(System.in));
+		try {
+			theLine = userIn.readLine();
+			
+		} catch (IOException e) {
+			logger.log(Level.INFO, e.getMessage());
+		}
+		
+		return theLine;
+	}
+	
+	public void repondreCommande(String theLine) throws RemoteException, MalformedURLException {
+		
+		if (theLine.equals("disconnect")) {
+			System.out.println("le serveur va terminer cette session");
+			
+			connexionComponent.disconnect(pseudo);
+			System.out.println(pseudo+ " est déconnecté");
+			pseudo="";
+		}
+		else if (theLine.equals("quit")) {
+			System.out.println("le serveur va fermer");
+			endSession=true;
+			connexionComponent.disconnect(pseudo);
+			
+		}
+		else if(theLine.contains("connect")) {
+			if(pseudo==null || pseudo.equals("")) {
+				
+				pseudo=theLine.split(" ")[1];
+				
+				Receiver receiverComponent=new ReceiverImpl(this);
+				Naming.rebind("Receiver"+pseudo, receiverComponent);
+				emitterComponent=connexionComponent.connect(pseudo,receiverComponent);
+				System.out.println(pseudo+ " est connecté");
+				if(clients!=null) {
+					
+					lastSizeClients=clients.size();
+				
+				//on affiche la liste des clients connectés
+				for (String c:clients) {
+					listeClients+=c+",";
+					System.out.println("Présents sur le réseau: "+listeClients);
+			
+				}
+				}
+				//on affiche les messages recus
+				if(messages!=null) {
+					lastSizeMessage=messages.size();
+				
+				
+				for (Message m:messages) {
+					
+					System.out.println("De: "+m.from+" - "+m.contenu);
+			
+				}
+				}
+			}
+			else {
+				System.out.println("Veuillez vous déconnecter de "+pseudo+ "afin de changer de compte");
+			}
+			
+			
+		}
+		else if(theLine.contains("sendMessage")) {
+			if(pseudo!=null) {
+				String to=theLine.split(";")[1];
+				String contenu=theLine.split(";")[2];
+				Message m=new Message(pseudo,to,contenu);
+				emitterComponent.sendMessage(m);
+				System.out.println("Envoyé!");
+				
+			}
+			else {
+				System.out.println("Veuillez vous connecter afin d'acceder au chat");
+			}
+			
+			
+		}
+		
+	}
 	
 	public void actualiserConsole() {
 		//cette fonction permet de rafraichir la liste de messages et clients
 		
 		if(this.pseudo!=null) {
-			if(this.clients!=null) {
-			if(this.clients.size()!=this.lastSizeClients) {
+			if(this.clients!=null && this.clients.size()!=this.lastSizeClients) {
+		
 				this.lastSizeClients=this.clients.size();
 				this.listeClients="";
 				for (String c:this.clients) {
@@ -61,24 +149,24 @@ public class Client {
 					System.out.println("Présents sur le réseau: "+this.listeClients);
 				}
 			
+			
 			}
-			}
-			if(this.messages!=null) {
-			if(this.messages.size()>this.lastSizeMessage) {
+			if(this.messages!=null && this.messages.size()>this.lastSizeMessage) {
+			
 				for(int i=this.lastSizeMessage;i<this.messages.size();i++) {
-					System.out.println("De: "+this.messages.get(i).from+" - "+this.messages.get(i).message);
+					System.out.println("De: "+this.messages.get(i).from+" - "+this.messages.get(i).contenu);
 				}
 				
 				this.lastSizeMessage=this.messages.size();
 						
-			}
+			
 			}
 		}
 	}
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		Hello myComponent;
+		
+	
 		Client client=new Client();
 		
 		
@@ -94,14 +182,14 @@ public class Client {
 		);
 		try {
 			
-			myComponent = (Hello) Naming.lookup("Hello");
-			connexionComponent = (Connexion) Naming.lookup("Connexion");
+			
+			client.connexionComponent = (Connexion) Naming.lookup("Connexion");
 			
 			
-			System.out.println(myComponent.sayHello());
+
 			
 			
-			BufferedReader userIn = new BufferedReader(new InputStreamReader(System.in));
+			
 			
 			boolean sessionStarted = false;
 			while (!client.endSession) {
@@ -120,90 +208,17 @@ public class Client {
 				
 				client.actualiserConsole();
 				String theLine="";
-				try {
-					theLine = userIn.readLine();
-					
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				theLine=client.lireCommande();
+				client.repondreCommande(theLine);
+				
 			
-				
-				if (theLine.equals("disconnect")) {
-					System.out.println("le serveur va terminer cette session");
-					
-					connexionComponent.disconnect(client.pseudo);
-					System.out.println(client.pseudo+ " est déconnecté");
-					client.pseudo="";
-				}
-				else if (theLine.equals("quit")) {
-					System.out.println("le serveur va fermer");
-					client.endSession=true;
-					connexionComponent.disconnect(client.pseudo);
-					
-				}
-				else if(theLine.contains("connect")) {
-					if(client.pseudo==null || client.pseudo.equals("")) {
-						
-						client.pseudo=theLine.split(" ")[1];
-						
-						Receiver receiverComponent=new ReceiverImpl(client);
-						Naming.rebind("Receiver"+client.pseudo, receiverComponent);
-						client.emitterComponent=connexionComponent.connect(client.pseudo,receiverComponent);
-						System.out.println(client.pseudo+ " est connecté");
-						if(client.clients!=null) {
-							
-							client.lastSizeClients=client.clients.size();
-						
-						//on affiche la liste des clients connectés
-						for (String c:client.clients) {
-							client.listeClients+=c+",";
-							System.out.println("Présents sur le réseau: "+client.listeClients);
-					
-						}
-						}
-						//on affiche les messages recus
-						if(client.messages!=null) {
-							client.lastSizeMessage=client.messages.size();
-						
-						
-						for (Message m:client.messages) {
-							
-							System.out.println("De: "+m.from+" - "+m.message);
-					
-						}
-						}
-					}
-					else {
-						System.out.println("Veuillez vous déconnecter de "+client.pseudo+ "afin de changer de compte");
-					}
-					
-					
-				}
-				else if(theLine.contains("sendMessage")) {
-					if(client.pseudo!=null) {
-						String to=theLine.split(";")[1];
-						String contenu=theLine.split(";")[2];
-						Message m=new Message(client.pseudo,to,contenu);
-						client.emitterComponent.sendMessage(m);
-						System.out.println("Envoyé!");
-						
-					}
-					else {
-						System.out.println("Veuillez vous connecter afin d'acceder au chat");
-					}
-					
-					
-				}
-				
 				
 		
 			}
 			
 			
 		} catch (MalformedURLException | RemoteException | NotBoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			client.logger.log(Level.INFO, e.getMessage());
 		}
 		
 		

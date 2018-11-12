@@ -1,19 +1,24 @@
-package src;
+package composants;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
 
-public class ConnectionImpl extends UnicastRemoteObject implements Connexion {
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import src.Server;
+
+public class ConnectionImpl extends UnicastRemoteObject implements Connexion , Serializable {
 	Server server;
 	
-
+	Logger logger = Logger.getLogger("logger");
 	protected ConnectionImpl() throws RemoteException {
 		super();
 	
-		// TODO Auto-generated constructor stub
+		
 	}
 	public ConnectionImpl(Server s)  throws RemoteException {
 		this.server=s;
@@ -21,7 +26,7 @@ public class ConnectionImpl extends UnicastRemoteObject implements Connexion {
 	
 	@Override
 	public Emitter connect(String nickname,Receiver rcv) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		//associer nickname et receiver dans un hashmap
 	    
 		server.clients.add(nickname);
@@ -31,8 +36,8 @@ public class ConnectionImpl extends UnicastRemoteObject implements Connexion {
 			Naming.rebind("Emitter"+nickname, emitterComponent);
 			
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		
+			logger.log(Level.INFO, e.getMessage());
 		}
 		
 
@@ -41,18 +46,15 @@ public class ConnectionImpl extends UnicastRemoteObject implements Connexion {
 
 	@Override
 	public void disconnect(String nickname) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		server.clients.remove(nickname);
 		server.clientsRecemmentPartis.add(nickname);
 		try {
 			Naming.unbind("Emitter"+nickname);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NotBoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (MalformedURLException|NotBoundException e) {
+		
+			logger.log(Level.INFO, e.getMessage());
+		} 
 
 	}
 
