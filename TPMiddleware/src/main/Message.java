@@ -1,3 +1,4 @@
+package main;
 import java.io.Serializable;
 
 public class Message implements Serializable {
@@ -10,17 +11,17 @@ public class Message implements Serializable {
 		return to;
 	}
 	
-	public String getMessage() {
-		return message;
+	public String getContenu() {
+		return contenu;
 	}
 	
 	String to;
-	String message;
+	String contenu;
 	public Message(String from, String to, String message) {
 		super();
 		this.from = from;
 		this.to = to;
-		this.message = message;
+		this.contenu = message;
 	}
 	
 	
