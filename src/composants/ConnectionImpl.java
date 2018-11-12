@@ -1,35 +1,39 @@
+package composants;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import main.Server;
 
 public class ConnectionImpl extends UnicastRemoteObject implements Connexion {
 	Server server;
-
+	Logger logger = Logger.getLogger("logger");
 	protected ConnectionImpl() throws RemoteException {
 		super();
-		// TODO Auto-generated constructor stub
+	
 	}
-	ConnectionImpl(Server server) throws RemoteException {
+	public ConnectionImpl(Server server) throws RemoteException {
 		this.server=server;
 	}
 
 	@Override
 	public Dialogue connect(String nickname) throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		
 	
-		server.clients.add(nickname);
+		server.addClient(nickname);
 		Dialogue dialogue =new DialogueImpl(nickname,server);
 		try {
 			
 			Naming.rebind("Dialogue"+nickname, dialogue);
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.INFO, e.getMessage());
+			
 		}
 
 		return dialogue;
@@ -37,17 +41,14 @@ public class ConnectionImpl extends UnicastRemoteObject implements Connexion {
 
 	@Override
 	public void disconnect(String nickname) throws RemoteException {
-		// TODO Auto-generated method stub
-		server.clients.remove(nickname);
+		
+		server.removeClient(nickname);
 		try {
 			Naming.unbind("Dialogue"+nickname);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NotBoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (MalformedURLException|NotBoundException e) {
+			
+			logger.log(Level.INFO, e.getMessage());
+		} 
 
 	}
 

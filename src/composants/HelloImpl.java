@@ -1,3 +1,4 @@
+package composants;
 
 
 import java.rmi.RemoteException;
@@ -7,12 +8,12 @@ public class HelloImpl extends UnicastRemoteObject implements Hello  {
 
 	protected HelloImpl() throws RemoteException {
 		super();
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	@Override
 	public String sayHello() throws RemoteException {
-		// TODO Auto-generated method stub
+		
 		return "Hello world";
 	}
 

@@ -1,3 +1,4 @@
+package composants;
 
 
 import java.rmi.Remote;
