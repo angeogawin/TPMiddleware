@@ -1,37 +1,46 @@
+package composants;
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.List;
 
-public class ClientManagerImpl extends UnicastRemoteObject implements ClientManager {
+import main.Client;
+
+public class ClientManagerImpl extends UnicastRemoteObject implements ClientManager,Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	Client client;
 	protected ClientManagerImpl() throws RemoteException {
 		super();
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	public ClientManagerImpl(Client client) throws RemoteException {
 		this.client=client;
-		// TODO Auto-generated constructor stub
+	
 	}
 
 	@Override
-	public void initClients(ArrayList<String> clients) throws RemoteException {
-		// TODO Auto-generated method stub
-		client.clients=clients;
+	public void initClients(List<String> clients) throws RemoteException {
+		
+		client.setClients(clients);
 
 	}
 
 	@Override
 	public void addClients(String client1) throws RemoteException {
-		// TODO Auto-generated method stub
-		client.clients.add(client1);
+	
+		client.addClient(client1);
 
 	}
 
 	@Override
 	public void remClient(String client1) throws RemoteException {
-		// TODO Auto-generated method stub
-		client.clients.remove(client1);
+		
+		client.removeClient(client1);
 
 	}
 
